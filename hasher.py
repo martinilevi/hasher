@@ -15,9 +15,8 @@ import sys
 import optparse
 import traceback
 
-from hashlib import sha256
-
-STOP_AND_SHOW_TRACE = False
+import hashlib
+import zlib
 
 def get_argument_parser():
     # initialize the parser object:
@@ -35,6 +34,30 @@ def get_argument_parser():
 
     return parser
 
+def crc(fileName):
+    prev = 0
+    for eachLine in open(fileName,"rb"):
+        prev = zlib.crc32(eachLine, prev)
+    return "%X"%(prev & 0xFFFFFFFF)
+
+def sha(fileName):
+    h = hashlib.sha256()
+    for eachLine in open(fileName,"rb"):
+        h.update(eachLine)
+    return h.hexdigest()
+
+def walk(rootdir='.'):
+    for dirName, subdirList, fileList in os.walk(rootDir):
+        print('Found directory: %s' % dirName)
+        for fname in fileList:
+            print('\t%s' % fname)
+
+def walkAndHash(rootDir='.'):
+    for dirName, subdirList, fileList in os.walk(rootDir):
+        print('Found directory: %s' % dirName)
+        for fname in fileList:
+            absname=os.path.join(dirName,fname)
+            print('\t%s\t%s\t%s' % (absname, crc(absname), sha(absname)))
 
 def main(argv=None):
     if argv is None:
@@ -56,5 +79,7 @@ def main(argv=None):
     return result
 
 if __name__ == '__main__':
-    status = main()
-    sys.exit(status)
+    #status = main()
+    #sys.exit(status)
+
+    walkAndHash()
