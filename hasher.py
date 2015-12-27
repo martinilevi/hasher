@@ -117,9 +117,6 @@ def main(argv=None):
         thefiles_crc = map_candidate
 
     map_candidate = readMap(r'sha256.hasher')
-    print "*"*80
-    print map_candidate
-    print "*"*80
     if map_candidate:
         thefiles_sha = map_candidate
 
